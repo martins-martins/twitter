@@ -1,0 +1,36 @@
+{% extends 'TwitterBundle::layout.html.twig' %}
+
+{% block title 'Twitter - Signup' %}
+
+{% block main %}
+    <div class="login">
+        {% if created_message %}
+              <div class="text-success">{{created_message}}</div>
+        {% endif %}  
+        <h3>Join Twitter</h3>
+        <form method="post" action="" role="form">
+            <div class="text-danger">{{errors.fullname}}</div>
+            <div class="form-group">
+                <input name="fullname" class="form-control" placeholder="Full name" value="{{user.fullname}}">
+            </div>
+            <div class="text-danger">{{errors.email}}</div>
+            <div class="form-group">
+                <input name="email" type="email" class="form-control" placeholder="Email" value="{{user.email}}">
+            </div>
+            <small>Password must be at least 6 characters long</small>
+            <div class="text-danger">{{errors.password}}</div>
+            <div class="form-group">
+                <input name="password" type="password" class="form-control" placeholder="Password" value="{{user.password}}">
+            </div>
+            <div class="form-group">
+                <input name="password2" type="password" class="form-control" placeholder="Repeat Password" value="{{user.password2}}">
+            </div>
+            <div class="text-danger">{{errors.username}}</div>
+            <div class="form-group">
+                <input name="username" class="form-control" placeholder="Choose username" value="{{user.username}}">
+            </div>
+            <input name="submit" type="submit" class="btn btn-default" value="Create My Account">
+        </form>
+        <a href="{{ path('_login') }}">Have Account ? Log In</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'TwitterBundle::layout.html.twig' %}
+
+{% block title 'Twitter - ' ~ h4_title %}
+
+ {% block global_nav %}
+    <div class="global-nav">
+        <div class="global-nav-inner">
+            <a href="{{ path('_home') }}">Home</a>
+            <form action="{{ path('_home', {'show': 'search'}) }}" role="form">
+                <div class="form-group">
+                    <input name="search_keyword" type="text" class="form-control" value="{{search_keyword}}">
+                </div>                    
+                <input type="submit" class="btn btn-default" value="Search">
+            </form>
+            <a href="{{ path('_home', {'show': 'all_users'}) }}">All Users</a>
+            <a href="{{ path('_logout') }}">Log Out</a>
+            </div>
+    </div>
+ {% endblock %}
+     
+{% block main %}
+       <div id="content">
+            <div class="profile-box">
+              <p class="name">{{ user_fullname }}</p>
+                <ul>
+                    <li><a href="{{ path('_home', {'show': 'my_tweets'}) }}"><span id="my_tweets_count">{{ my_tweets_count }}</span> MY TWEETS</a></li>
+                    <li><a href="{{ path('_home', {'show': 'following'}) }}"><span id="following_count">{{ following_count }}</span> FOLLOWING</a></li>
+                    <li><a href="{{ path('_home', {'show': 'followers'}) }}">{{ followers_count }} FOLLOWERS</a></li>
+                </ul>
+                <form method="post" action="" role="form">
+                    <div class="form-group">
+                        <textarea name="tweet" cols="40" rows="5" class="form-control" maxlength="140" placeholder="Compose new Tweet..."></textarea>
+                    </div>
+                    <input name="post_tweet" disabled="disabled" type="submit" class="btn btn-default" value="Tweet">
+                    <span class="counter">140</span>
+                </form>  
+            </div>
+            <div class="main-content">
+                <h4>{{h4_title}}</h4>
+                {% if users|length > 0 %}
+                    {% for user in users %}
+                     <div class="user">
+                            <span>{{ user.fullname }}</span>
+                            <span class="light-grey">{{ user.username }}</span>
+                            <a href="{{ path('_ajax_follow', {'user_id': user.user_id,'following':user.following}) }}" following="{{user.following}}" class="follow btn btn-default">
+                            {% if user.following %}
+                                Unfollow 
+                            {% else %}
+                                Follow
+                            {% endif %}
+                            </a>
+                        </div>
+                    {% endfor %} 
+                {% endif %}    
+                    
+                {% if tweets|length > 0 %}
+                    {% for tweet in tweets %}
+                        {% if tweet.conversation %}
+                            <div class="tweet tweet-conversation" id="{{ tweet.tweet_id }}">
+                        {% else %}
+                            <div class="tweet" id="{{ tweet.tweet_id }}">
+                        {% endif %}
+                                <div class="tweet-user">
+                                    <span>{{ tweet.fullname }}</span>
+                                    <span class="light-grey">{{ tweet.username }}</span>
+                                    <span class="tweet-time">{{ tweet.time }}</span>
+                                </div>
+                                <p>{{ tweet.text }}</p>
+                                {% if tweet.retweeted_by %}
+                                    <p class="light-grey">Retweeted by {{ tweet.retweeted_by_users }}</p>
+                                {% endif %}
+                                {% if tweet.conversation_link %}
+                                    <a href="{{ path('_home_tweets_conversation', {'show':url_show_fragment,'tweet_id': tweet.tweet_id}) }}#{{ tweet.tweet_id }}" class="show-conversation">Show conversation</a>
+                                {% endif %}
+                                {% if tweet.user_id != user_id %}
+                                    <a href="{{ path('_ajax_retweet', {'tweet_id': tweet.tweet_id,'retweeted':tweet.retweeted}) }}" retweeted="{{tweet.retweeted}}" class="retweet">
+                                    {% if tweet.retweeted %}
+                                        Retweeted 
+                                    {% else %}
+                                        Retweet
+                                    {% endif %}
+                                    </a>
+                                {% endif %}
+                                <a href="#" class="reply">Reply</a>
+                                {% if tweet.user_id == user_id %}
+                                    <a href="{{ path('_delete_tweet', {'show':url_show_fragment,'tweet_id': tweet.tweet_id}) }}" class="delete">Delete</a>
+                                {% endif %}
+                                <form method="post" action="" role="form" style="display: none;">
+                                    <input type="hidden" name="tweet_id" value="{{ tweet.tweet_id }}">
+                                    <div class="form-group">
+                                        <textarea name="tweet" cols="40" rows="4" class="form-control" maxlength="140"></textarea>
+                                    </div>
+                                    <input name="post_tweet" disabled="disabled" type="submit" class="btn btn-default" value="Reply">
+                                    <span class="counter">140</span>
+                                </form>
+                            </div>
+                    {% endfor %} 
+                {% endif %}
+                {% if message %}
+                    <div class="text-danger home-message">{{message}}</div>
+                {% endif %}
+            </div>
+        </div>
+{% endblock %}

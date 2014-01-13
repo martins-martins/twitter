@@ -1,0 +1,19 @@
+{% extends "::base.html.twig" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ asset('bundles/twitter/css/main.css') }}" />
+    <script src="{{ asset('bundles/twitter/js/jquery-1.10.2.js') }}"></script> 
+    <script src="{{ asset('bundles/twitter/js/bootstrap.js') }}"></script> 
+    <script src="{{ asset('bundles/twitter/js/main.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="wrapper">
+            <div class="global-nav">
+                {% block global_nav %}{% endblock %}    
+            </div>
+            <div class="main">
+                {% block main %}{% endblock %}
+            </div> 
+        </div>
+{% endblock %}

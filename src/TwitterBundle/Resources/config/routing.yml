@@ -1,0 +1,49 @@
+_login:
+    pattern:  /
+    defaults: { _controller: TwitterBundle:Twitter:index }
+ 
+_activate:
+    pattern:  /activate/{activation_hash}
+    defaults: { _controller: TwitterBundle:Twitter:index } 
+    
+_signup:
+    path: /signup
+    defaults: { _controller: TwitterBundle:Twitter:signup }
+    
+_home:
+    path: /home/{show}
+    defaults: { _controller: TwitterBundle:Twitter:home, show:all_tweets }
+    requirements:
+        show: |all_users|all_tweets|my_tweets|following|followers|search
+        
+_home_tweets_conversation:
+    path: /home/{show}/{tweet_id}
+    defaults: { _controller: TwitterBundle:Twitter:home }
+    requirements:
+        show: all_tweets|my_tweets
+        tweet_id: \d+
+        
+_delete_tweet:
+    path: /{show}/{tweet_id}
+    defaults: { _controller: TwitterBundle:Twitter:delete }
+    requirements:
+        show: all_tweets|my_tweets
+        tweet_id: \d+
+    
+_logout:
+    path: /logout
+    defaults: { _controller: TwitterBundle:Twitter:logout }
+    
+_ajax_follow:
+    path: /ajax/follow/{user_id}/{following}
+    defaults: { _controller: TwitterBundle:Twitter:ajaxFollow }
+    requirements:
+        user_id: \d+
+        following: 0|1
+    
+_ajax_retweet:
+    path: /ajax/retweet/{tweet_id}/{retweeted}
+    defaults: { _controller: TwitterBundle:Twitter:ajaxRetweet }
+    requirements:
+        tweet_id: \d+
+        retweeted: 0|1

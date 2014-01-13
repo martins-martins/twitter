@@ -1,0 +1,144 @@
+@import url('bootstrap.css');
+@import url('bootstrap-theme.css');
+
+body {
+  background-color: #3a92c8;  
+}
+
+/* Global navigation bar */
+.global-nav { 
+    background-color: #252525;
+     height: 50px;
+}
+
+.global-nav-inner {
+    width: 800px;
+    margin: 0 auto;
+    padding: 10px 0 10px 0;
+}
+
+.global-nav-inner a, .global-nav-inner form{
+    float: left;
+    margin-left: 30px;
+    font-size: 16px;
+}
+
+.global-nav-inner .form-group {
+    float: left;
+    margin-right: 10px;
+}
+
+.global-nav-inner input {
+    border-radius: 14px;
+}
+.global-nav-inner .btn {
+    line-height: 15px;
+}
+/*  Login section */
+div.login {
+    background: rgb(238, 238, 238);
+    width: 40%;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+div.login form{
+    margin-bottom: 20px;
+}
+
+div.login a {
+    font-size: 1.5em;
+    display: inline;
+}
+
+/* Profile box */
+.profile-box {
+    width: 280px;
+    background-color: rgb(238, 238, 238);
+    padding: 10px;
+    border-radius: 10px;
+    float: left;
+}
+
+.profile-box ul {
+    list-style: none;
+    padding-left: 0px;
+}
+
+/* Main content */
+.main {
+    width: 800px;
+    margin: 0 auto;
+}
+
+.main-logged-in {
+    width: 800px;
+    margin: 20px auto;
+}
+
+#content {
+}
+
+.main-content {
+    background-color: rgb(238, 238, 238);
+    margin-left: 300px;
+    padding: 10px 0 10px 0;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.main-content h4{
+    padding: 0 10px 10px 10px;
+    border-bottom: 1px solid #cccccc;
+}
+div.user {
+    border-bottom: 1px solid #cccccc;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    height: 60px;
+}
+
+div.user a {
+    float:right;
+    font-weight: bold;    
+}
+
+.light-grey {
+    color:#999;    
+}
+
+/* Tweet in main section */
+div.tweet {
+    border-bottom: 1px solid #cccccc;
+    width: 100%;
+    padding: 10px 10px 30px 10px;
+    margin-bottom: 10px;
+}
+div.tweet a.delete, a.reply, div.tweet a.retweet {
+    float:right;
+    margin-left: 10px;
+    line-height: 10px;   
+}    
+div.tweet a.show-conversation {
+    float:left;   
+}
+div.tweet form{
+   margin-top: 35px; 
+}
+
+div.tweet-conversation {
+    background-color: rgba(138, 168, 206, 0.30);    
+}
+
+div.tweet-user{
+   width: 100%; 
+}
+
+div.tweet-user span.tweet-time{
+   float: right; 
+}
+
+div.home-message {
+    margin-left : 10px;
+}
