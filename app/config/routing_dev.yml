@@ -1,14 +1,14 @@
-_wdt:
-    resource: "@WebProfilerBundle/Resources/config/routing/wdt.xml"
-    prefix:   /_wdt
+#_wdt:
+#    resource: "@WebProfilerBundle/Resources/config/routing/wdt.xml"
+#    prefix:   /_wdt
 
-_profiler:
-    resource: "@WebProfilerBundle/Resources/config/routing/profiler.xml"
-    prefix:   /_profiler
+#_profiler:
+#    resource: "@WebProfilerBundle/Resources/config/routing/profiler.xml"
+#    prefix:   /_profiler
 
-_configurator:
-    resource: "@SensioDistributionBundle/Resources/config/routing/webconfigurator.xml"
-    prefix:   /_configurator
+#_configurator:
+#    resource: "@SensioDistributionBundle/Resources/config/routing/webconfigurator.xml"
+#    prefix:   /_configurator
 
 _main:
     resource: routing.yml
@@ -17,8 +17,8 @@ _twitter:
     resource: "@TwitterBundle/Resources/config/routing.yml" 
     
 # AcmeDemoBundle routes (to be removed)
-_acme_demo:
-    resource: "@AcmeDemoBundle/Resources/config/routing.yml"
+#_acme_demo:
+#    resource: "@AcmeDemoBundle/Resources/config/routing.yml"
     
 
   

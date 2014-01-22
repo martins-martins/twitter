@@ -3,18 +3,16 @@
 {% block title 'Twitter - ' ~ h4_title %}
 
  {% block global_nav %}
-    <div class="global-nav">
-        <div class="global-nav-inner">
-            <a href="{{ path('_home') }}">Home</a>
-            <form action="{{ path('_home', {'show': 'search'}) }}" role="form">
-                <div class="form-group">
-                    <input name="search_keyword" type="text" class="form-control" value="{{search_keyword}}">
-                </div>                    
-                <input type="submit" class="btn btn-default" value="Search">
-            </form>
-            <a href="{{ path('_home', {'show': 'all_users'}) }}">All Users</a>
-            <a href="{{ path('_logout') }}">Log Out</a>
-            </div>
+    <div class="global-nav-inner">
+        <a href="{{ path('_home') }}">Home</a>
+        <form action="{{ path('_home', {'show': 'search'}) }}" role="form">
+            <div class="form-group">
+                <input name="search_keyword" type="text" class="form-control" value="{{search_keyword}}">
+            </div>                    
+            <input type="submit" class="btn btn-default" value="Search">
+        </form>
+        <a href="{{ path('_home', {'show': 'all_users'}) }}">All Users</a>
+        <a href="{{ path('_logout') }}">Log Out</a>
     </div>
  {% endblock %}
      
@@ -35,7 +33,7 @@
                     <span class="counter">140</span>
                 </form>  
             </div>
-            <div class="main-content">
+            <div class="main-content" id="tweet-column">
                 <h4>{{h4_title}}</h4>
                 {% if users|length > 0 %}
                     {% for user in users %}
@@ -61,8 +59,7 @@
                             <div class="tweet" id="{{ tweet.tweet_id }}">
                         {% endif %}
                                 <div class="tweet-user">
-                                    <span>{{ tweet.fullname }}</span>
-                                    <span class="light-grey">{{ tweet.username }}</span>
+                                    <span class="tweet-user-fullname">{{ tweet.fullname }}</span><span class="light-grey">{{ tweet.username }}</span>
                                     <span class="tweet-time">{{ tweet.time }}</span>
                                 </div>
                                 <p>{{ tweet.text }}</p>
@@ -70,7 +67,7 @@
                                     <p class="light-grey">Retweeted by {{ tweet.retweeted_by_users }}</p>
                                 {% endif %}
                                 {% if tweet.conversation_link %}
-                                    <a href="{{ path('_home_tweets_conversation', {'show':url_show_fragment,'tweet_id': tweet.tweet_id}) }}#{{ tweet.tweet_id }}" class="show-conversation">Show conversation</a>
+                                    <a href="{{ path('_ajax_tweets', {'show':url_show_fragment,'tweet_id': tweet.tweet_id,'recursive':1}) }}" class="show-conversation">Show conversation</a>
                                 {% endif %}
                                 {% if tweet.user_id != user_id %}
                                     <a href="{{ path('_ajax_retweet', {'tweet_id': tweet.tweet_id,'retweeted':tweet.retweeted}) }}" retweeted="{{tweet.retweeted}}" class="retweet">
@@ -94,7 +91,12 @@
                                     <span class="counter">140</span>
                                 </form>
                             </div>
-                    {% endfor %} 
+                    {% endfor %}
+                       <div id="loadmoreajaxloader" style="display:none;" user_id="{{user_id}}" 
+                       delete_link="{{ path('_delete_tweet', {'show':url_show_fragment,'tweet_id': 0}) }}" 
+                       retweet_link="{{ path('_ajax_retweet', {'tweet_id': 0,'retweeted':0}) }}" 
+                       tweets_link="{{ path('_ajax_tweets', {'show':url_show_fragment,'tweet_id': 0,'recursive':0}) }}">
+                       <center><img src="{{ asset('bundles/twitter/images/ajax-loader.gif') }}" /></center></div> 
                 {% endif %}
                 {% if message %}
                     <div class="text-danger home-message">{{message}}</div>
