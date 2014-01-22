@@ -5,10 +5,16 @@ body {
   background-color: #3a92c8;  
 }
 
+.wrapper {
+    border-top: 1px solid black;
+}
+
 /* Global navigation bar */
 .global-nav { 
+    position: fixed;
+    width: 100%;
     background-color: #252525;
-     height: 50px;
+    height: 50px;
 }
 
 .global-nav-inner {
@@ -40,7 +46,7 @@ div.login {
     width: 40%;
     border-radius: 5px;
     padding: 10px;
-    margin-top: 20px;
+    margin-top: 70px;
 }
 
 div.login form{
@@ -54,6 +60,7 @@ div.login a {
 
 /* Profile box */
 .profile-box {
+    position: fixed;
     width: 280px;
     background-color: rgb(238, 238, 238);
     padding: 10px;
@@ -78,6 +85,7 @@ div.login a {
 }
 
 #content {
+    padding-top: 60px;
 }
 
 .main-content {
@@ -85,7 +93,6 @@ div.login a {
     margin-left: 300px;
     padding: 10px 0 10px 0;
     border-radius: 10px;
-    margin-top: 10px;
 }
 .main-content h4{
     padding: 0 10px 10px 10px;
@@ -133,6 +140,10 @@ div.tweet-conversation {
 
 div.tweet-user{
    width: 100%; 
+}
+
+div.tweet-user span.tweet-user-fullname{
+   margin-right: 10px; 
 }
 
 div.tweet-user span.tweet-time{

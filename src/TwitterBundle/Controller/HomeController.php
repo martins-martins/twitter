@@ -2,177 +2,13 @@
 
 namespace TwitterBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use TwitterBundle\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
               
-class TwitterController extends Controller
-{
-    private $mysqli;
-    private $session;
-    private $user_id;
-    private $user_fullname;
-    
-    function __construct() {
-        $this->session = new Session();
-        $this->session->start();
-        $this->user_id = 0;
-        if($this->session->has('user_id')) {
-           $this->user_id = $this->session->get('user_id');  
-           $this->user_fullname = $this->session->get('fullname');  
-        }
-        $this->mysqli = mysqli_connect("localhost", "root", "", "twitter"); 
-    }
-    
-    public function indexAction($activation_hash = '')
-    {
-        $success_message = '';
-        $fail_message = '';
-        
-        if($activation_hash != '') {
-            
-             $res = mysqli_query($this->mysqli, "UPDATE users 
-                                                    SET activated='1', hash='' 
-                                                    WHERE hash='".mysqli_escape_string($this->mysqli, $activation_hash)."'");
-             if(mysqli_affected_rows($this->mysqli)==1) {
-                $success_message = 'Account activated. You can now log in.'; 
-             } else {
-                $fail_message = 'Invalid activation code'; 
-             }   
-        }
-        if(isset($_POST['username'])){
-            $user = $_POST['username']; 
-            $pass = $_POST['password'];
-            $valid = false;
-            if(strlen($user) > 0 && strlen($pass) > 0) {
-               
-                $res = mysqli_query($this->mysqli, "SELECT id, username, full_name, activated 
-                                                    FROM users 
-                                                    WHERE username='".mysqli_escape_string($this->mysqli, $user)."' AND 
-                                                          password='".md5($pass)."'");
-                if (mysqli_num_rows($res) > 0) {
-                    $row = mysqli_fetch_assoc($res);
-                    if($row['activated'] == '1') {                  
-                        $valid = true;
-                        
-                        $this->session->set('user_id', $row['id']);
-                        $this->session->set('username', $row['username']);
-                        $this->session->set('fullname', $row['full_name']);
-                    } else {
-                      $fail_message = 'Account not activated';  
-                    }
-                } else {
-                    $fail_message = 'Wrong username/password';    
-                }    
-            } else {
-               $fail_message = 'Wrong username/password';  
-            }
-            if($valid) {
-              return $this->redirect($this->generateUrl('_home'), 301);  
-            }
-        }
-        
-         return $this->render('TwitterBundle:Twitter:login.html.twig', array('success_message'=>$success_message,
-                                                                             'fail_message'=>$fail_message));    
-    }
-                         
-    public function signupAction()
-    {
-        $fullname = isset($_POST['fullname']) ? trim($_POST['fullname']) : '';
-        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-        $password2 = isset($_POST['password2']) ? trim($_POST['password2']) : '';
-        $username = isset($_POST['username']) ? trim($_POST['username']) : '';
-        
-        $validated = false;
-        $errors = array('fullname' => '',
-                        'email' => '',
-                        'password' => '',
-                        'username' => '');
-                        
-        if (isset($_POST['username'])) {
-            $validated = true;
-            if(strlen($fullname) < 1) {
-                $errors['fullname'] = 'Full name must be at least 1 character long.';
-                $validated = false;    
-            } elseif(strlen($fullname) > 50) {
-                $errors['fullname'] = 'Full name must be shorter than 51 characters.';
-                $validated = false;    
-            }
-            if($validated) {
-                $res = mysqli_query($this->mysqli, "SELECT id FROM users WHERE full_name='".mysqli_escape_string($this->mysqli, $fullname)."'");
-                if (mysqli_num_rows($res) > 0) {
-                    $errors['fullname'] = 'Account already exists with Full name : '.$fullname.'.';
-                    $validated = false;    
-                }
-            }
-            if(strlen($email) > 50) {
-                $errors['email'] = 'Email must be shorter than 51 characters.';
-                $validated = false;    
-            }elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors['email'] = 'Email is invalid.';
-                $validated = false;
-            }
-            if($errors['email'] == '') {
-                $res = mysqli_query($this->mysqli, "SELECT id FROM users WHERE email='".mysqli_escape_string($this->mysqli, $email)."'");
-                if (mysqli_num_rows($res) > 0) {
-                    $errors['email'] = 'Account already exists with email : '.$email.'. Please choose another email.';
-                    $validated = false;    
-                }
-            }
-            if(strlen($password) < 6) {
-                $errors['password'] = 'Password must be at least 6 characters long.';
-                $validated = false;    
-            } elseif ($password != $password2) {
-                $errors['password'] = 'Passwords do not match.';
-                $validated = false;    
-            }
-            if(strlen($username) < 1) {
-                $errors['username'] = 'Username must be at least 1 character long.';
-                $validated = false;    
-            } elseif(strlen($username) > 50) {
-                $errors['username'] = 'Username must be shorter than 51 characters.';
-                $validated = false;    
-            }
-            if($errors['username'] == '') {
-                $res = mysqli_query($this->mysqli, "SELECT id FROM users WHERE username='".mysqli_escape_string($this->mysqli, $username)."'");
-                if (mysqli_num_rows($res) > 0) {
-                    $errors['username'] = 'Account already exists with username : '.$username.'.';
-                    $validated = false;    
-                }
-            }
-        }
-        
-        $created_message = '';
-        if($validated) {
-            $activation_hash = md5(time().$username);
-            $res = mysqli_query($this->mysqli, "INSERT INTO users (username, password, full_name, email, hash) 
-                                                            VALUES ('".mysqli_escape_string($this->mysqli, $username)."',
-                                                            '".md5(mysqli_escape_string($this->mysqli, $password))."',
-                                                            '".mysqli_escape_string($this->mysqli, $fullname)."',
-                                                            '".mysqli_escape_string($this->mysqli, $email)."','".$activation_hash."')");
-            $url = $this->generateUrl('_activate',
-                                        array('activation_hash' => $activation_hash), true);
-            $message = "Hello ".$fullname." !
-                        Click on link to activate your Twitter account : <a href=".$url.">activate</a>";
-            $mail_sent = mail($email, 'Activation of your new Twitter account', $message);
-            if($mail_sent) {
-                $created_message = 'Account created. Message with activation link sent to '.$email; 
-            }
-            $fullname = $email = $password = $password2 = $username = '';                                                
-        }
-        return $this->render('TwitterBundle:Twitter:signup.html.twig',
-                            array('user' => array('fullname' => $fullname,
-                                                  'email' => $email,
-                                                  'password' => $password,
-                                                  'password2' => $password2,
-                                                  'username' => $username,),
-                                'created_message' => $created_message,
-                                'errors' => $errors));
-    }
-    
+class HomeController extends BaseController
+{   
     // show : all_tweets|my_tweets|following|followers|all_users|search
-    public function homeAction($show = 'all_tweets', $tweet_id = 0)
+    public function homeAction($show = 'all_tweets')
     {   
         if($this->user_id == 0) {
             return $this->redirect($this->generateUrl('_login'), 301);    
@@ -194,6 +30,16 @@ class TwitterController extends Controller
                                                 VALUES (".intval($this->user_id).",
                                                 ".intval($parent_id).",
                                                 '".mysqli_escape_string($this->mysqli, $_POST['tweet'])."')");
+                                                
+            $last_id = mysqli_insert_id($this->mysqli); 
+            //for($i=0;$i<10;$i++){
+//                $res = mysqli_query($this->mysqli, "INSERT INTO tweets (user_id, parent_id, tweet) 
+//                                                VALUES (".intval($this->user_id).",
+//                                                ".intval($last_id).",
+//                                                '".$i."')");
+//                                                
+//                $last_id = mysqli_insert_id($this->mysqli);
+//            }
             return $this->redirect($this->generateUrl('_home'), 301);                                        
         }
         $message = '';
@@ -234,7 +80,7 @@ class TwitterController extends Controller
         $search_keyword = isset($_GET['search_keyword'])?$_GET['search_keyword']:'';
         // show tweets else users
         if($show == 'all_tweets' || $show == 'my_tweets') {
-            $this->get_tweets($tweets, $conversation, $show, $tweet_id);
+            $this->get_tweets($tweets, $conversation, $show);
             
             if(count($tweets) < 1) {
               $message = 'There are no tweets.';  
@@ -317,12 +163,6 @@ class TwitterController extends Controller
                                       'search_keyword' => $search_keyword,
                                       'message' => $message));
     }
-    
-    public function logoutAction()
-    {
-        $this->session->invalidate();
-        return $this->redirect($this->generateUrl('_login'), 301);   
-    }
     public function deleteAction($show, $tweet_id)
     {
         if($this->user_id == 0) {
@@ -381,7 +221,7 @@ class TwitterController extends Controller
         return $response;
     }
     
-    private function get_tweets(&$tweets, &$conversation, $show, $tweet_id, $recursive = false) {
+    private function get_tweets(&$tweets, &$conversation, $show, $tweet_id = 0, $recursive = 0, $ajax = 0) {
         
         $query = "SELECT tweets.id, tweets.parent_id, tweets.user_id, tweets.tweet, tweets.time_created, users.full_name, users.username, 
                         (SELECT user_id 
@@ -431,7 +271,18 @@ class TwitterController extends Controller
                                      WHERE user_id=".intval($this->user_id).")";    
         }
         $query .= " ORDER BY tweets.time_created DESC";
-         
+        if ($recursive == 0) {
+            if($ajax == 0) {
+               $page = 1;  
+            } else {
+                $page = $this->session->get('tweets_page');
+            }
+            
+            $query .= " LIMIT 8 OFFSET ".($page-1)*8;
+            
+            $page += 1;
+            $this->session->set('tweets_page', $page);
+        } 
         $res = mysqli_query($this->mysqli, $query);
                 
         if (mysqli_num_rows($res) > 0) {
@@ -455,7 +306,7 @@ class TwitterController extends Controller
                 }
                 // if current tweet belongs to conversation and parent exists, go fetch one
                 if($tweet_id == $row['id'] && $row['parent_id'] > 0) {
-                    $this->get_tweets($tweets, $conversation, $show, $row['parent_id'], true);
+                    $this->get_tweets($tweets, $conversation, $show, $row['parent_id'], 1);
                 }
                 // checks for conversation
                 if(count($conversation) > 0) {
@@ -467,7 +318,23 @@ class TwitterController extends Controller
                     $conversation = array(); 
                 } 
             }
-        }        
+        }
+        
+        if($ajax == 1) {
+            return $tweets;    
+        }
+    }
+    // returns tweets for infinite scroll or conversation
+    public function ajaxTweetsAction($show, $tweet_id = 0, $recursive = 0)
+    {   
+        $tweets = array();
+        $conversation = array();
+           
+        $response = new Response();
+        $response->setContent(json_encode($this->get_tweets($tweets, $conversation, $show, $tweet_id, $recursive, 1))); 
+        $response->setStatusCode(Response::HTTP_OK);
+        $response->headers->set('Content-Type', 'text/json');
+        return $response;
     }
 }      
 ?>
