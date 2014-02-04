@@ -34,7 +34,6 @@ $(document).ready(function($){
       context: this                 
     }).done(function(data) {
       // 1 success
-      data = 1;
       if(data==1) {
         var following_count =  $('#following_count').html();
         if(following==1) {
